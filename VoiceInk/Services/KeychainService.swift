@@ -2,7 +2,7 @@ import Foundation
 import Security
 import os
 
-/// Securely stores and retrieves API keys using Keychain with iCloud sync.
+/// Securely stores and retrieves API keys using Keychain (iCloud sync disabled).
 final class KeychainService {
     static let shared = KeychainService()
 
@@ -15,7 +15,7 @@ final class KeychainService {
 
     /// Saves a string value to Keychain.
     @discardableResult
-    func save(_ value: String, forKey key: String, syncable: Bool = true) -> Bool {
+    func save(_ value: String, forKey key: String, syncable: Bool = false) -> Bool { // iCloud sync disabled
         guard let data = value.data(using: .utf8) else {
             logger.error("Failed to convert value to data for key: \(key)")
             return false
@@ -25,7 +25,7 @@ final class KeychainService {
 
     /// Saves data to Keychain.
     @discardableResult
-    func save(data: Data, forKey key: String, syncable: Bool = true) -> Bool {
+    func save(data: Data, forKey key: String, syncable: Bool = false) -> Bool { // iCloud sync disabled
         // First, try to delete any existing item to avoid duplicates
         delete(forKey: key, syncable: syncable)
 
@@ -44,7 +44,7 @@ final class KeychainService {
     }
 
     /// Retrieves a string value from Keychain.
-    func getString(forKey key: String, syncable: Bool = true) -> String? {
+    func getString(forKey key: String, syncable: Bool = false) -> String? { // iCloud sync disabled
         guard let data = getData(forKey: key, syncable: syncable) else {
             return nil
         }
@@ -52,7 +52,7 @@ final class KeychainService {
     }
 
     /// Retrieves data from Keychain.
-    func getData(forKey key: String, syncable: Bool = true) -> Data? {
+    func getData(forKey key: String, syncable: Bool = false) -> Data? { // iCloud sync disabled
         var query = baseQuery(forKey: key, syncable: syncable)
         query[kSecReturnData as String] = kCFBooleanTrue
         query[kSecMatchLimit as String] = kSecMatchLimitOne
@@ -71,7 +71,7 @@ final class KeychainService {
 
     /// Deletes an item from Keychain.
     @discardableResult
-    func delete(forKey key: String, syncable: Bool = true) -> Bool {
+    func delete(forKey key: String, syncable: Bool = false) -> Bool { // iCloud sync disabled
         let query = baseQuery(forKey: key, syncable: syncable)
         let status = SecItemDelete(query as CFDictionary)
 
@@ -87,7 +87,7 @@ final class KeychainService {
     }
 
     /// Checks if a key exists in Keychain.
-    func exists(forKey key: String, syncable: Bool = true) -> Bool {
+    func exists(forKey key: String, syncable: Bool = false) -> Bool { // iCloud sync disabled
         var query = baseQuery(forKey: key, syncable: syncable)
         query[kSecReturnData as String] = kCFBooleanFalse
 
@@ -106,9 +106,10 @@ final class KeychainService {
             kSecUseDataProtectionKeychain as String: true
         ]
 
-        if syncable {
-            query[kSecAttrSynchronizable as String] = kCFBooleanTrue
-        }
+        // iCloud Keychain sync disabled
+        // if syncable {
+        //     query[kSecAttrSynchronizable as String] = kCFBooleanTrue
+        // }
 
         return query
     }

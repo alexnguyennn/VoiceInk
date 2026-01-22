@@ -1,0 +1,179 @@
+#+TITLE: VoiceInk CloudKit and iCloud Sync Removal
+#+AUTHOR: OpenCode
+#+DATE: 2026-01-22
+
+* Overview
+
+This document summarizes the changes made to disable CloudKit and iCloud sync
+functionality in VoiceInk while preserving all local functionality.
+
+* Changes Made
+
+** 1. VoiceInk.swift (Main App Configuration)
+
+*** Location
+=VoiceInk/VoiceInk.swift= lines 146-153
+
+*** Changes
+- Disabled CloudKit sync for dictionary database configuration
+- Changed =cloudKitDatabase= from =.private("iCloud.com.prakashjoshipax.VoiceInk")= to =.none=
+- Updated comment to indicate CloudKit synchronization is disabled
+- Preserved original CloudKit container ID in comment for reference
+
+*** Code Change
+#+begin_src swift
+// Dictionary configuration (CloudKit-synchronized - DISABLED)
+let dictionarySchema = Schema([VocabularyWord.self, WordReplacement.self])
+let dictionaryConfig = ModelConfiguration(
+    "dictionary",
+    schema: dictionarySchema,
+    url: dictionaryStoreURL,
+    cloudKitDatabase: .none // CloudKit disabled
+    // cloudKitDatabase: .private("iCloud.com.prakashjoshipax.VoiceInk")
+)
+#+end_src
+
+** 2. KeychainService.swift (Keychain Storage)
+
+*** Location
+=VoiceInk/Services/KeychainService.swift=
+
+*** Changes
+- Changed all =syncable= parameter defaults from =true= to =false= (7 functions)
+- Commented out iCloud Keychain sync implementation (=kSecAttrSynchronizable=)
+- Updated class documentation to reflect disabled iCloud sync
+- Added inline comments marking where iCloud sync was disabled
+
+*** Affected Functions
+- =save(_:forKey:syncable:)=
+- =save(data:forKey:syncable:)=
+- =getString(forKey:syncable:)=
+- =getData(forKey:syncable:)=
+- =delete(forKey:syncable:)=
+- =exists(forKey:syncable:)=
+
+*** Code Change (baseQuery method)
+#+begin_src swift
+// iCloud Keychain sync disabled
+// if syncable {
+//     query[kSecAttrSynchronizable as String] = kCFBooleanTrue
+// }
+#+end_src
+
+** 3. APIKeyManager.swift (API Key Management)
+
+*** Location
+=VoiceInk/Services/APIKeyManager.swift= line 14
+
+*** Changes
+- Updated documentation comment from "iOS compatible for iCloud sync" to "iCloud sync disabled"
+
+* Functionality Status
+
+** ✓ Still Working (Local Storage)
+
+- SwiftData models (Transcription, VocabularyWord, WordReplacement)
+- Local persistent storage in Application Support directory
+- Keychain storage for API keys (local only)
+- All transcription functionality
+- All app features and UI
+- Custom vocabulary and word replacements (local only)
+
+** ✗ Disabled (Cloud Sync)
+
+- CloudKit sync for dictionary data across devices
+- iCloud Keychain sync for API keys across devices
+- Cross-device synchronization of custom vocabulary
+- Cross-device synchronization of word replacements
+
+* Build Verification
+
+The project was successfully built after these changes:
+
+#+begin_src bash
+cd /Users/alex/bench/dev/VoiceInk
+xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug clean build
+#+end_src
+
+Result: =** BUILD SUCCEEDED **=
+
+* How to Get the Built App
+
+** Option 1: Terminal Copy Command
+
+Copy to Desktop:
+#+begin_src bash
+cp -R ~/Library/Developer/Xcode/DerivedData/VoiceInk-*/Build/Products/Debug/VoiceInk.app ~/Desktop/
+#+end_src
+
+Copy to specific location:
+#+begin_src bash
+cp -R ~/Library/Developer/Xcode/DerivedData/VoiceInk-*/Build/Products/Debug/VoiceInk.app /path/to/destination/
+#+end_src
+
+** Option 2: Open in Finder
+
+#+begin_src bash
+open ~/Library/Developer/Xcode/DerivedData/VoiceInk-*/Build/Products/Debug/
+#+end_src
+
+Then manually copy =VoiceInk.app= to your desired location.
+
+** Option 3: Using Xcode GUI
+
+1. In Xcode: *Product* → *Show Build Folder in Finder*
+2. Navigate to =Products/Debug/= folder
+3. Right-click =VoiceInk.app= and copy to desired location
+
+** Build Configurations
+
+- *Debug build*: =Build/Products/Debug/VoiceInk.app=
+  - Includes debugging symbols
+  - Larger file size
+  - Built with: =xcodebuild -configuration Debug=
+
+- *Release build*: =Build/Products/Release/VoiceInk.app=
+  - Optimized for distribution
+  - Smaller file size
+  - Built with: =xcodebuild -configuration Release=
+
+** Full Build Path
+
+The exact path from the latest build:
+#+begin_example
+/Users/alex/Library/Developer/Xcode/DerivedData/VoiceInk-erveftxleqyyhlbukaiwncltopze/Build/Products/Debug/VoiceInk.app
+#+end_example
+
+* Additional Notes
+
+** No Push Notifications Found
+
+A search for push notification code (=UNUserNotificationCenter=,
+=registerForRemoteNotifications=, etc.) found no matches. The app does not
+use remote push notifications.
+
+** Entitlements File
+
+The =VoiceInk.entitlements= file was checked but contains no CloudKit or
+iCloud-specific entitlements. It only contains:
+- App Sandbox (disabled)
+- Audio input access
+- Network client/server access
+- Screen capture access
+- Keychain access groups
+
+** Migration Impact
+
+Existing users who were using CloudKit sync will:
+- Retain their local data
+- No longer sync dictionary data across devices
+- Need to manually export/import custom vocabulary if moving between devices
+- Keep their existing API keys locally
+
+** Future Considerations
+
+If CloudKit sync needs to be re-enabled:
+1. Uncomment the CloudKit database configuration in =VoiceInk.swift=
+2. Re-enable iCloud Keychain sync in =KeychainService.swift=
+3. Update documentation comments back to original state
+4. Test migration path for users upgrading from non-sync version

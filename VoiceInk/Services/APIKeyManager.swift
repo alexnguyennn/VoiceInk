@@ -11,7 +11,7 @@ final class APIKeyManager {
 
     private let migrationCompletedKey = "APIKeyMigrationToKeychainCompleted_v2"
 
-    /// Provider to Keychain identifier mapping (iOS compatible for iCloud sync).
+    /// Provider to Keychain identifier mapping (iCloud sync disabled).
     private static let providerToKeychainKey: [String: String] = [
         "groq": "groqAPIKey",
         "deepgram": "deepgramAPIKey",
