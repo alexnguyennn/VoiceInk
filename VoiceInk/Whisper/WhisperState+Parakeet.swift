@@ -66,13 +66,15 @@ extension WhisperState {
     }
 
     @MainActor
-    func deleteParakeetModel(_ model: ParakeetModel) {
+    func deleteParakeetModel(_ model: ParakeetModel) async {
         if let currentModel = currentTranscriptionModel,
            currentModel.provider == .parakeet,
            currentModel.name == model.name {
             currentTranscriptionModel = nil
             UserDefaults.standard.removeObject(forKey: "CurrentTranscriptionModel")
         }
+
+        await ParakeetTranscriptionService.shared.cleanup()
 
         let version = parakeetVersion(for: model.name)
         let cacheDirectory = parakeetCacheDirectory(for: version)

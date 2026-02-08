@@ -153,7 +153,9 @@ struct ParakeetModelCardRowView: View {
             if isDownloaded {
                 Menu {
                     Button(action: {
-                         whisperState.deleteParakeetModel(model)
+                        Task {
+                            await whisperState.deleteParakeetModel(model)
+                        }
                     }) {
                         Label("Delete Model", systemImage: "trash")
                     }

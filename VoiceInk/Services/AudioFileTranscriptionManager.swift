@@ -60,9 +60,6 @@ class AudioTranscriptionManager: ObservableObject {
                 }
 
                 let serviceRegistry = TranscriptionServiceRegistry(whisperState: whisperState, modelsDirectory: whisperState.modelsDirectory)
-                defer {
-                    serviceRegistry.cleanup()
-                }
 
                 processingPhase = .processingAudio
                 let samples = try await audioProcessor.processAudioToSamples(url)

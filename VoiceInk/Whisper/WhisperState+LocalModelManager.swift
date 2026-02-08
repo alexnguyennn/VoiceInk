@@ -340,7 +340,6 @@ extension WhisperState {
         await whisperContext?.releaseResources()
         whisperContext = nil
         isModelLoaded = false
-        serviceRegistry.cleanup()
     }
     
     // MARK: - Helper Methods

@@ -25,6 +25,12 @@ extension WhisperState {
         if model.provider != .local {
             self.isModelLoaded = true
         }
+
+        if let parakeetModel = model as? ParakeetModel, isParakeetModelDownloaded(parakeetModel) {
+            Task {
+                try? await ParakeetTranscriptionService.shared.loadModel(for: parakeetModel)
+            }
+        }
         // Post notification about the model change
         NotificationCenter.default.post(name: .didChangeModel, object: nil, userInfo: ["modelName": model.name])
         NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)

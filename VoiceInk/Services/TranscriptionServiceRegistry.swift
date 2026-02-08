@@ -14,7 +14,7 @@ class TranscriptionServiceRegistry {
     )
     private(set) lazy var cloudTranscriptionService = CloudTranscriptionService(modelContext: whisperState.modelContext)
     private(set) lazy var nativeAppleTranscriptionService = NativeAppleTranscriptionService()
-    private(set) lazy var parakeetTranscriptionService = ParakeetTranscriptionService()
+    private(set) var parakeetTranscriptionService = ParakeetTranscriptionService.shared
 
     init(whisperState: WhisperState, modelsDirectory: URL) {
         self.whisperState = whisperState
@@ -40,7 +40,4 @@ class TranscriptionServiceRegistry {
         return try await service.transcribe(audioURL: audioURL, model: model)
     }
 
-    func cleanup() {
-        parakeetTranscriptionService.cleanup()
-    }
 }
