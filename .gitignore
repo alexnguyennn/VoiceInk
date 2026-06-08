@@ -7,7 +7,6 @@ xcuserdata/
 
 ## Obj-C/Swift specific
 *.hmap
-*.profraw
 
 ## App packaging
 *.ipa
@@ -35,6 +34,8 @@ build/
 .local-build/
 .review-build/
 .local-dependencies/
+.build-derived-data/
+.build-test/
 
 # CocoaPods
 #
