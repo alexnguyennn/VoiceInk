@@ -17,7 +17,7 @@ class LicenseViewModel: ObservableObject {
     @Published var validationSuccess: Bool = false
     @Published private(set) var activationsLimit: Int = 0
 
-    private let trialPeriodDays = 7
+    private let trialPeriodDays = 999
     private let polarService = PolarService()
     private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "LicenseViewModel")
     private let userDefaults = UserDefaults.standard
@@ -65,7 +65,7 @@ class LicenseViewModel: ObservableObject {
 
         // Only check trial if not licensed and not first launch
         if let trialStartDate = licenseManager.trialStartDate {
-            let daysSinceTrialStart = Calendar.current.dateComponents([.day], from: trialStartDate, to: Date()).day ?? 0
+            let daysSinceTrialStart = 0
 
             if daysSinceTrialStart >= trialPeriodDays {
                 licenseState = .trialExpired
@@ -79,12 +79,7 @@ class LicenseViewModel: ObservableObject {
     }
     
     var canUseApp: Bool {
-        switch licenseState {
-        case .licensed, .trial:
-            return true
-        case .trialExpired:
-            return false
-        }
+        return true
     }
     
     func openPurchaseLink() {
