@@ -5,7 +5,7 @@ This guide provides detailed instructions for building VoiceInk from source.
 ## Prerequisites
 
 Before you begin, ensure you have:
-- macOS 14.4 or later
+- macOS Sequoia 15.0 or later
 - Xcode (latest version recommended)
 - Swift (latest version recommended)
 - Git (for cloning repositories)
@@ -63,6 +63,14 @@ git clone https://github.com/Beingpax/VoiceInk.git
 cd VoiceInk
 make local
 open ~/Downloads/VoiceInk.app
+```
+
+To install the local build into the top-level Applications folder, run:
+
+```bash
+make local
+./move.sh
+open /Applications/VoiceInk.app
 ```
 
 This builds VoiceInk with ad-hoc signing using a separate build configuration (`LocalBuild.xcconfig`) that requires no Apple Developer account.
