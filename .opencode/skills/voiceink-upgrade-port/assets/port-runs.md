@@ -25,3 +25,9 @@ Append a dated entry after each upgrade attempt. Keep commands, revisions, resol
 **Next sync**
 
 Check available tags, toolchain and package resolution again. Source any feature-only patches from the original remote/backup ref or new branch history, rather than comparing entire upstream trees. Retest `LOCAL_BUILD` semantics and the output path before deciding whether a trial or Makefile patch is needed.
+
+## 2026-09-25 — earlier v2.20 attempt (preserved in original worktree notes)
+
+- The uncommitted `PORT-2.20-PLAN.md` and `AGENT_MEMORY.local.md` in `/Users/alex/bench/dev/VoiceInk` record an earlier attempt. On that checkout with Xcode 26.2, automatic resolution substituted `mlx-swift` 0.31.4 for pinned 0.31.6 and `mlx-swift-lm` failed to compile. `make local` did not succeed; no install followed. The notes also record installing the missing Metal Toolchain via `xcodebuild -downloadComponent MetalToolchain` before reaching that compile failure.
+- On v2.20, `make local` builds **Release** and the Debug configuration produces `VoiceInk Dev.app`. The old local-path workaround set `CONFIGURATION_BUILD_DIR` to `.local-build/Build/Products/Debug` while retaining Release; changing to Debug would alter the app identity. This is historical to v2.20: verify the current candidate's Makefile and product name rather than inheriting the workaround.
+- The completed checklists in the v2.1 test worktree corroborate the v2.11 failure, v2.1 build success, Sequoia 15.0 deployment settings, and the reconciled `LOCAL_BUILD` licensed behavior documented above. They contain no additional patch to carry forward.
