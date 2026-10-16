@@ -2,6 +2,29 @@
 
 Append a dated entry after each upgrade attempt. Keep commands, revisions, resolved dependencies, outcome, and the reason for including or excluding each local delta. Re-check all conclusions on the next run.
 
+## 2026-10-16 — v2.21 on Xcode 26.6 / Swift 6.3.3
+
+**Inputs and preservation**
+
+- Base: upstream tag `v2.21` at `640b0c8c` (2026-09-28). New branch `feature/custom-buld-update-v2.21` created from the tag in `/Users/alex/bench/dev/VoiceInk`; previous branch `feature/custom-build-update-v2.1` (tip `af30ff3`) left intact.
+- Feature-only commits cherry-picked from the v2.1 branch: `d50955d` shipping/docs (now `c1ff8ef`) and the four `docs(upgrade)` commits (`050dd07`…`c7e66c2`). Published to `origin/feature/custom-buld-update-v2.21`.
+
+**Compatibility evidence**
+
+- v2.21 still pins `mlx-swift` 0.31.6 (needs Swift tools >= 6.3). The old 6.2.4 blocker is gone: Xcode 26.6 (user-installed at `/Applications/Xcode-26.6.0.app` via Xcodes; `brew install --cask xcode` no longer exists) ships Swift 6.3.3 and package resolution succeeded.
+- Homebrew no longer offers an `xcode` cask; Xcode was installed by the user. `xcode-select` still points at CommandLineTools; builds run with `DEVELOPER_DIR=/Applications/Xcode-26.6.0.app/Contents/Developer`.
+- First `make local` failed only on `CompileMetalFile` for mlx-swift: `cannot execute tool 'metal' due to missing Metal Toolchain`. Fixed with `xcodebuild -downloadComponent MetalToolchain` (Metal Toolchain 17F109); the retry built cleanly. Same sharp edge as the 2026-09-25 v2.20 note — expect it on every fresh Xcode.
+
+**Port and verification**
+
+- v2.21 upstream already carries macOS 15.0 deployment targets, macOS 15.0+ docs, and `#if LOCAL_BUILD` auto-license in `VoiceInk/Features/Licensing/State/LicenseViewModel.swift`; no pbxproj, trial, or Makefile patches were needed (`git diff v2.21..HEAD -- Makefile` empty). Carried deltas: `move.sh`, BUILDING.md `/Applications` install section, `.gitignore` build dirs, upgrade-port docs.
+- `move.sh` was retargeted from `Debug` to `.local-build/Build/Products/Release/VoiceInk.app` because v2.21 `make local` builds Release.
+- `make local` succeeded; only then `./move.sh` installed. Installed bundle reports version `2.20` (upstream tags without bumping `MARKETING_VERSION`; the tag/commit is the authority) and minimum macOS `15.0`; built and installed executables matched (`cmp`). `open /Applications/VoiceInk.app` succeeded and the process was present. `git diff --check` passed; `move.sh` contains no `xcodebuild`.
+
+**Next sync**
+
+Verify `make local` output path and `LOCAL_BUILD` semantics again; assume a fresh Xcode needs the Metal Toolchain download before the first mlx build.
+
 ## 2026-09-26 — v2.1 on Xcode 26.3 / Swift 6.2.4
 
 **Inputs and preservation**

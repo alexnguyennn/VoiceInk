@@ -1,4 +1,5 @@
 # VoiceInk local port notes
 
 - Read `.opencode/skills/voiceink-upgrade-port/SKILL.md` and its `assets/port-runs.md` before syncing local build/install changes onto another upstream tag. The log records why the v2.1 port kept upstream `LOCAL_BUILD` licensed behavior instead of the prior 999-day trial override.
-- Original checkout's v2.13 uncommitted port was preserved before switching to `feature/custom-build-update-v2.1` as git stash commit `110007fe682838acbaf7c789bb778305ed065943`. Do not drop it until the archived changes are no longer needed.
+- Original checkout's v2.13 uncommitted port was preserved before switching to `feature/custom-build-update-v2.1` as git stash commit `110007fe682838acbaf7c789bb778305ed065943`. Do not drop it until the archived changes are no longer needed. (Note: as of 2026-10-16 this object is no longer present in the local repo — it was likely pruned or lived in a removed worktree's object store.)
+- Toolchain on this machine (2026-10-16): Xcode 26.6 lives at `/Applications/Xcode-26.6.0.app` but `xcode-select` points at CommandLineTools; export `DEVELOPER_DIR=/Applications/Xcode-26.6.0.app/Contents/Developer` for `make local`. A fresh Xcode needs `xcodebuild -downloadComponent MetalToolchain` before mlx-swift Metal kernels compile. `brew install --cask xcode` no longer exists.
